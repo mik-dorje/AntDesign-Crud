@@ -5,6 +5,7 @@ import {
   Form,
   Input,
   InputNumber,
+  message,
   Modal,
   Popconfirm,
   Row,
@@ -18,6 +19,7 @@ import {
   SearchOutlined,
   QuestionCircleOutlined,
   PlusCircleFilled,
+  DeleteFilled,
 } from "@ant-design/icons";
 
 interface DataType {
@@ -101,7 +103,7 @@ const App: React.FC = () => {
   const fetchData = async () => {
     const result = await axios("https://jsonplaceholder.typicode.com/users");
     // const data = result.data.map(({ username, email, phone, website, company, ...rest }) => rest);
-    const data = result.data.map((object: DataType) => {
+    const dataObj = result.data.map((object: DataType) => {
       return {
         key: object?.id?.toString(),
         id: object.id,
@@ -110,8 +112,8 @@ const App: React.FC = () => {
         address: `${object.address.city}, ${object.address.street}`,
       };
     });
-    setData(data);
-    setTableData(data);
+    setData(dataObj);
+    setTableData(dataObj);
     setLoaded(true);
   };
 
@@ -141,12 +143,19 @@ const App: React.FC = () => {
     setEditingKey(record.key);
   };
 
-  const handleDelete = (key: React.Key) => {
-    const newData = data.filter((item) => item.key !== key);
+  const handleDelete = (record: Partial<DataType> & { key: React.Key }) => {
+    const newData = data.filter((item) => item.key !== record.key);
     setData(newData);
+    console.log(record)
+
+
+    message.error({
+      content: `${record.name} removed`,
+      icon: <DeleteFilled />,
+    });
   };
 
-  const save = async (key: React.Key) => {
+  const update = async (key: React.Key) => {
     try {
       const row = (await form.validateFields()) as DataType;
 
@@ -165,6 +174,7 @@ const App: React.FC = () => {
         setData(newData);
         setEditingKey("");
       }
+      message.info("Data updated");
     } catch (errInfo) {
       console.log("Validate Failed:", errInfo);
     }
@@ -185,8 +195,10 @@ const App: React.FC = () => {
         address: values.address,
       },
     ]);
+
     formModal.resetFields();
     setModalOpen(false);
+    message.success(`${values.firstname} ${values.lastname} added`);
   };
 
   const handleModalCancel = () => {
@@ -222,7 +234,7 @@ const App: React.FC = () => {
           <Space size="middle">
             <Button
               type="primary"
-              onClick={() => save(record.key)}
+              onClick={() => update(record.key)}
               style={{
                 backgroundColor: " #38375f",
                 border: "none",
@@ -251,7 +263,7 @@ const App: React.FC = () => {
             <Popconfirm
               title="Are you sure to delete this record?"
               icon={<QuestionCircleOutlined style={{ color: "red" }} />}
-              onConfirm={() => handleDelete(record.key)}
+              onConfirm={() => handleDelete(record)}
               okText="Delete"
               cancelText="Cancel"
             >
@@ -279,17 +291,6 @@ const App: React.FC = () => {
   ];
 
   const mergedColumns = columns.map((col) => {
-    console.log({ loaded, data, tableData });
-    console.log(`col.editable : ${col.editable}`);
-
-    // if (!loaded ) {
-    //   return {
-    //     dataIndex: col.dataIndex,
-    //     title: col.title,
-    //     editing: false,
-    //   };
-    // }
-
     if (!col.editable) {
       return col;
     }
@@ -329,7 +330,6 @@ const App: React.FC = () => {
             onFinish={onFinish}
             // onFinishFailed={onFinishFailed}
             // autoComplete="off"
-            // style={{background: "green"}}
           >
             <Form.Item
               label="ID"
@@ -371,7 +371,11 @@ const App: React.FC = () => {
               <Col xs={{ offset: 9 }}>
                 <Space size="middle">
                   <Form.Item>
-                    <Button type="primary" htmlType="submit">
+                    <Button
+                      type="primary"
+                      htmlType="submit"
+                      style={{ width: "75px" }}
+                    >
                       Add
                     </Button>
                   </Form.Item>
