@@ -19,8 +19,6 @@ import {
   QuestionCircleOutlined,
   PlusCircleFilled,
 } from "@ant-design/icons";
-import { createLanguageService } from "typescript";
-import { table } from "console";
 
 interface DataType {
   key: string;
@@ -113,6 +111,8 @@ const App: React.FC = () => {
       };
     });
     setData(data);
+    setTableData(data);
+    setLoaded(true);
   };
 
   useEffect(() => {
@@ -134,7 +134,6 @@ const App: React.FC = () => {
       );
       setTableData(resultArray);
     }
-    setLoaded(true);
   }, [typedWord, data]);
 
   const edit = (record: Partial<DataType> & { key: React.Key }) => {
@@ -219,7 +218,6 @@ const App: React.FC = () => {
       width: "20%",
       render: (_: any, record: DataType) => {
         const editable = isEditing(record);
-        console.log({ editable });
         return editable ? (
           <Space size="middle">
             <Button
@@ -281,6 +279,17 @@ const App: React.FC = () => {
   ];
 
   const mergedColumns = columns.map((col) => {
+    console.log({ loaded, data, tableData });
+    console.log(`col.editable : ${col.editable}`);
+
+    // if (!loaded ) {
+    //   return {
+    //     dataIndex: col.dataIndex,
+    //     title: col.title,
+    //     editing: false,
+    //   };
+    // }
+
     if (!col.editable) {
       return col;
     }
@@ -303,7 +312,7 @@ const App: React.FC = () => {
         <Modal
           title="New User"
           centered
-          visible={modalOpen}
+          open={modalOpen}
           onOk={() => setModalOpen(false)}
           onCancel={() => setModalOpen(false)}
           okButtonProps={{ hidden: true }}
@@ -383,11 +392,7 @@ const App: React.FC = () => {
               <Form.Item>
                 <Button
                   type="primary"
-                  icon={
-                    <PlusCircleFilled
-                      style={{ fontSize: "18px", marginRight: "5px" }}
-                    />
-                  }
+                  icon={<PlusCircleFilled style={{ fontSize: "18px" }} />}
                   onClick={() => setModalOpen(true)}
                 >
                   <Typography.Text strong style={{ color: "white" }}>
@@ -412,11 +417,7 @@ const App: React.FC = () => {
             </Col>
           </Row>
 
-          {!loaded ? (
-            <div className="loader-box">
-              <span className="loader"></span>
-            </div>
-          ) : (
+          {loaded ? (
             <Table
               className="main-table"
               components={{
@@ -433,6 +434,10 @@ const App: React.FC = () => {
                 pageSize: 5,
               }}
             />
+          ) : (
+            <div className="loader-box">
+              <span className="loader"></span>
+            </div>
           )}
         </Form>
       </div>
