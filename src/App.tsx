@@ -17,7 +17,6 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import {
   SearchOutlined,
-  QuestionCircleOutlined,
   PlusCircleFilled,
   DeleteFilled,
 } from "@ant-design/icons";
@@ -60,9 +59,23 @@ const EditableCell: React.FC<EditableCellProps> = ({
 }) => {
   const inputNode =
     inputType === "number" ? (
-      <InputNumber style={{ width: "90%" }} />
+      <InputNumber
+        style={{
+          width: "90%",
+          backgroundColor: "#fff",
+          border: " 1px dotted #8b8a8b",
+          borderRadius: "6px",
+        }}
+      />
     ) : (
-      <Input style={{ width: "90%" }} />
+      <Input
+        style={{
+          width: "90%",
+          backgroundColor: "#fff",
+          border: " 1px dotted #8b8a8b",
+          borderRadius: "6px",
+        }}
+      />
     );
 
   return (
@@ -146,11 +159,10 @@ const App: React.FC = () => {
   const handleDelete = (record: Partial<DataType> & { key: React.Key }) => {
     const newData = data.filter((item) => item.key !== record.key);
     setData(newData);
-    console.log(record)
+    console.log(record);
 
-
-    message.error({
-      content: `${record.name} removed`,
+    message.success({
+      content: `${record.name} removed !`,
       icon: <DeleteFilled />,
     });
   };
@@ -174,7 +186,7 @@ const App: React.FC = () => {
         setData(newData);
         setEditingKey("");
       }
-      message.info("Data updated");
+      message.info("Data updated !");
     } catch (errInfo) {
       console.log("Validate Failed:", errInfo);
     }
@@ -198,7 +210,7 @@ const App: React.FC = () => {
 
     formModal.resetFields();
     setModalOpen(false);
-    message.success(`${values.firstname} ${values.lastname} added`);
+    message.success(`${values.firstname} ${values.lastname} added !`);
   };
 
   const handleModalCancel = () => {
@@ -261,8 +273,8 @@ const App: React.FC = () => {
         ) : (
           <Space size="middle">
             <Popconfirm
-              title="Are you sure to delete this record?"
-              icon={<QuestionCircleOutlined style={{ color: "red" }} />}
+              title="Are you sure to delete this record ?"
+              icon={<DeleteFilled style={{ color: "red" }} />}
               onConfirm={() => handleDelete(record)}
               okText="Delete"
               cancelText="Cancel"
